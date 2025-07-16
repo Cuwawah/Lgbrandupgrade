@@ -236,7 +236,7 @@
             left: 0;
             width: 100%;
             height: 120%; /* Larger to allow for parallax movement */
-            background: url('IMG_3787.jpeg') no-repeat center center/cover; /* UPDATED TO IMG_3787.jpeg */
+            background: url('IMG_3787.jpeg') no-repeat center center/cover;
             transform: translateZ(-10px) scale(1.1); /* Initial scale for smoother effect */
             z-index: -1;
             /* This is a simple CSS fixed background parallax. For more advanced,
@@ -285,6 +285,12 @@
         }
         /* No need for .fade-in, .slide-up etc. to define final state - that's default */
         /* They now only serve to identify the initial transform in JS */
+
+        /* THIS IS THE CRUCIAL PART TO ADD/ENSURE IS IN YOUR CSS */
+        .animate-on-scroll.in-view {
+            opacity: 1 !important; /* Ensure visibility */
+            transform: none !important; /* Reset any initial transforms */
+        }
 
 
         /* Featured Products Section */
@@ -889,17 +895,6 @@
                 // Observe the element
                 observer.observe(element);
             });
-
-            // --- Add CSS for 'in-view' states dynamically ---
-            // This part defines what happens when 'in-view' class is added
-            const styleSheet = document.createElement('style');
-            styleSheet.innerHTML = `
-                .animate-on-scroll.in-view {
-                    opacity: 1 !important;
-                    transform: none !important;
-                }
-            `;
-            document.head.appendChild(styleSheet);
         }); // End DOMContentLoaded
     </script>
 </body>
