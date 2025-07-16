@@ -14,7 +14,7 @@
         /* CSS Custom Properties (Variables) for Branding */
         :root {
             --lg-primary-red: #DB0023; /* A more distinct LG red */
-            --lg-dark-red: #A3001C;    /* Darker for hover */
+            --lg-dark-red: #A3001C;     /* Darker for hover */
             --lg-accent-blue: #007bff; /* Example accent blue (can be replaced) */
             --color-dark-text: #1a1a1a;
             --color-medium-text: #4a4a4a;
@@ -825,35 +825,21 @@
                     if (navMenu.classList.contains('open')) {
                         hamburger.classList.remove('active');
                         navMenu.classList.remove('open');
-                        hamburger.setAttribute('aria-expanded', 'false');
+                        hamburger.setAttribute('aria-expanded', false);
                     }
-                    // Smooth scroll is handled by CSS (scroll-behavior: smooth)
-                    // If you wanted more custom JS scrolling:
-                    // const targetId = this.getAttribute('href');
-                    // if (targetId && targetId.startsWith('#')) {
-                    //     event.preventDefault(); // Prevent default jump
-                    //     const targetElement = document.querySelector(targetId);
-                    //     if (targetElement) {
-                    //         targetElement.scrollIntoView({ behavior: 'smooth' });
-                    //     }
-                    // }
                 });
             });
 
-
-            // --- Scroll-to-Top Button ---
+            // --- Scroll-to-Top Button Logic ---
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
-            
-            // Set initial state for the button. It's hidden by default via CSS 'opacity: 0' and 'pointer-events: none'.
-            // The JS will manage these properties.
-            
+
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 400) { // Show button after scrolling 400px
+                if (window.scrollY > 300) { // Show button after scrolling down 300px
                     scrollToTopBtn.style.opacity = '1';
-                    scrollToTopBtn.style.pointerEvents = 'auto'; // Re-enable interaction
+                    scrollToTopBtn.style.pointerEvents = 'auto';
                 } else {
                     scrollToTopBtn.style.opacity = '0';
-                    scrollToTopBtn.style.pointerEvents = 'none'; // Disable interaction when hidden
+                    scrollToTopBtn.style.pointerEvents = 'none';
                 }
             });
 
@@ -863,82 +849,58 @@
                     behavior: 'smooth'
                 });
             });
-            
 
-            // --- Scroll-Triggered Animations (Intersection Observer for various animations) ---
+            // --- Intersection Observer for Scroll-Triggered Animations ---
             const animateElements = document.querySelectorAll('.animate-on-scroll');
 
             const observerOptions = {
-                root: null, // relative to the viewport
+                root: null, // viewport
                 rootMargin: '0px',
-                threshold: 0.1 // 10% of element visible to trigger
+                threshold: 0.1 // Trigger when 10% of the element is visible
             };
 
-            const observerCallback = (entries, observer) => {
+            const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // When intersecting, remove the initial hidden state styles
-                        // This causes the CSS transitions to apply and animate the element
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0) translateX(0)'; // Reset transforms to their natural state
-                        observer.unobserve(entry.target); // Stop observing once animated
+                        // Element is in view, add the 'in-view' class
+                        entry.target.classList.add('in-view');
+                        // Stop observing once animated
+                        observer.unobserve(entry.target);
                     }
                 });
-            };
+            }, observerOptions);
 
-            const animObserver = new IntersectionObserver(observerCallback, observerOptions);
-
-            animateElements.forEach(el => {
-                // Set the initial hidden and transformed state for elements *before* they are observed.
-                // This ensures they are hidden when the page loads, and then
-                // revealed by the Intersection Observer.
-                if (el.classList.contains('slide-up')) {
-                    el.style.transform = 'translateY(40px)';
-                } else if (el.classList.contains('slide-left')) {
-                    el.style.transform = 'translateX(-40px)';
-                } else if (el.classList.contains('slide-right')) {
-                    el.style.transform = 'translateX(40px)';
-                } else if (el.classList.contains('fade-in')) {
-                    // For pure fade-in, only opacity needs to be set
-                    // The hero section's 'fade-in' class handles its own animation via @keyframes
-                    // This specifically applies to other 'fade-in' classes on content sections
-                    el.style.transform = 'translateY(20px)'; // Give a slight subtle slide-up with fade
-                }
-                el.style.opacity = '0'; // All starting hidden
-
-                // Add a small delay for staggered animations within grids/sections
-                // Example: Products grid, each item delays slightly from the previous
-                // For this to work, ensure your HTML elements are ordered as you want them staggered.
-                const delay = el.dataset.animationDelay ? parseFloat(el.dataset.animationDelay) : 0;
-                if (delay > 0) {
-                    el.style.transitionDelay = `${delay}s`;
+            // Initially hide elements and then observe them
+            animateElements.forEach(element => {
+                // Apply initial hidden state based on animation type
+                if (element.classList.contains('fade-in')) {
+                    element.style.opacity = '0';
+                } else if (element.classList.contains('slide-up')) {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateY(50px)';
+                } else if (element.classList.contains('slide-left')) {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateX(-50px)';
+                } else if (element.classList.contains('slide-right')) {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateX(50px)';
                 }
                 
-                animObserver.observe(el);
+                // Observe the element
+                observer.observe(element);
             });
 
-
-            // --- Image Hotspot Tooltips (for keyboard navigation) ---
-            const hotspots = document.querySelectorAll('.hotspot');
-            hotspots.forEach(hotspot => {
-                hotspot.addEventListener('focus', () => {
-                    const tooltip = hotspot.querySelector('.hotspot-tooltip');
-                    if (tooltip) {
-                        tooltip.style.opacity = '1';
-                        // The translateY is handled by the CSS :hover/.focus state now for consistency
-                    }
-                });
-                hotspot.addEventListener('blur', () => {
-                    const tooltip = hotspot.querySelector('.hotspot-tooltip');
-                    if (tooltip) {
-                        tooltip.style.opacity = '0';
-                        // The translateY is handled by the CSS :hover/.focus state now for consistency
-                    }
-                });
-            });
-
-            console.log("LG Reimagined Website Loaded with all selected Enhancements!");
-        });
+            // --- Add CSS for 'in-view' states dynamically ---
+            // This part defines what happens when 'in-view' class is added
+            const styleSheet = document.createElement('style');
+            styleSheet.innerHTML = `
+                .animate-on-scroll.in-view {
+                    opacity: 1 !important;
+                    transform: none !important;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }); // End DOMContentLoaded
     </script>
 </body>
 </html>
